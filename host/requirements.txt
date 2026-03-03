@@ -1,0 +1,8 @@
+pyqt5
+pyqtgraph
+adafruit-ampy
+PyOpenGL
+numpy
+scipy  # For audio filtering
+matplotlib
+scikit-learn  # Optional: for ML motion classifier
