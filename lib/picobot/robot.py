@@ -152,30 +152,31 @@ class Robot:
 
         self.buzzer.off()
 
-    def demo_dj(self, duration=10, bpm=128):
+    def demo_dj(self, duration=10, bpm=128, max_speed=80):
         """
         Techno DJ mode: melodic riff, four-on-the-floor, build-ups, drops!
 
         Args:
             duration: Total duration in seconds
             bpm: Beats per minute (default 128 for techno)
+            max_speed: Maximum motor speed 0-255 (default 80)
         """
+        s = max_speed
         COLORS = [
             (255, 0, 50), (0, 50, 255), (255, 0, 255),
             (0, 255, 200), (255, 80, 0), (150, 0, 255),
         ]
         # Melodic riff: minor-key techno arpeggio (A minor / E minor vibe)
         RIFF = [330, 392, 494, 392, 330, 294, 330, 262]  # E4 G4 B4 G4 E4 D4 E4 C4
-        # Movement patterns — full speed for visible motion
         MOVES = [
-            (255, -255),   # full spin right
-            (-255, 255),   # full spin left
-            (255, 80),     # hard arc right
-            (80, 255),     # hard arc left
-            (-200, -200),  # reverse
-            (255, 255),    # charge forward
-            (-255, 255),   # spin left
-            (255, 100),    # wide arc right
+            (s, -s),             # spin right
+            (-s, s),             # spin left
+            (s, s * 30 // 100),  # hard arc right
+            (s * 30 // 100, s),  # hard arc left
+            (-s * 80 // 100, -s * 80 // 100),  # reverse
+            (s, s),              # charge forward
+            (-s, s),             # spin left
+            (s, s * 40 // 100),  # wide arc right
         ]
 
         beat_ms = 60000 // bpm
@@ -224,7 +225,7 @@ class Robot:
 
                 elif phrase_beat < 15:
                     # ── BUILD-UP: accelerating hats + rising pitch + spin ──
-                    self.motors.set_speed(-200, 200)
+                    self.motors.set_speed(-s, s)
 
                     step = phrase_beat - 12
                     n_hits = 4 + step * 4
@@ -245,13 +246,13 @@ class Robot:
                     time.sleep_ms(60)
 
                     self.leds.fill((255, 255, 255))
-                    self.motors.set_speed(255, 255)
+                    self.motors.set_speed(s, s)
                     for f in (150, 120, 90, 70, 55):
                         self.buzzer.tone(f)
                         time.sleep_ms(beat_ms // 5)
                     self.buzzer.off()
 
-                    self.motors.set_speed(255, -255)
+                    self.motors.set_speed(s, -s)
                     self.leds.fill(color)
                     time.sleep_ms(beat_ms // 2)
                     self.motors.stop()
@@ -261,7 +262,7 @@ class Robot:
                 beat += 1
 
             # Finale: rapid strobe + descending bass
-            self.motors.set_speed(255, -255)
+            self.motors.set_speed(s, -s)
             for i in range(12):
                 self.leds.fill((255, 255, 255))
                 self.buzzer.tone(200 - i * 12)
@@ -271,7 +272,7 @@ class Robot:
                 time.sleep_ms(20)
             self.leds.fill((255, 0, 255))
             self.buzzer.tone(55)
-            self.motors.set_speed(255, 255)
+            self.motors.set_speed(s, s)
             time.sleep_ms(300)
 
         except KeyboardInterrupt:
@@ -281,7 +282,7 @@ class Robot:
         self.buzzer.off()
         self.leds.off()
 
-    def demo_dj_live(self, duration=60, sensitivity=80):
+    def demo_dj_live(self, duration=60, sensitivity=80, max_speed=80):
         """
         Live DJ mode: robot reacts to music from your phone!
 
@@ -291,20 +292,22 @@ class Robot:
         Args:
             duration: How long to run in seconds (default 60)
             sensitivity: 10-100, higher = needs louder sound (default 80)
+            max_speed: Maximum motor speed 0-255 (default 80)
         """
+        s = max_speed
         COLORS = [
             (255, 0, 50), (0, 50, 255), (255, 0, 255),
             (0, 255, 200), (255, 80, 0), (150, 0, 255),
         ]
         MOVES = [
-            (255, -255),   # full spin right
-            (-255, 255),   # full spin left
-            (255, 80),     # hard arc right
-            (80, 255),     # hard arc left
-            (-200, -200),  # reverse burst
-            (255, 255),    # charge forward
-            (-255, 255),   # spin left
-            (255, 100),    # wide arc right
+            (s, -s),             # spin right
+            (-s, s),             # spin left
+            (s, s * 30 // 100),  # hard arc right
+            (s * 30 // 100, s),  # hard arc left
+            (-s * 80 // 100, -s * 80 // 100),  # reverse burst
+            (s, s),              # charge forward
+            (-s, s),             # spin left
+            (s, s * 40 // 100),  # wide arc right
         ]
 
         print("Live DJ Mode!")
