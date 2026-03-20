@@ -7,7 +7,8 @@ LEARNING OBJECTIVES:
 --------------------
   1. Understand differential drive robot kinematics
   2. Control motor speed with PWM
-  3. Implement basic movements (forward, backward, turn, curve)
+  3. Discover how PWM frequency affects motor behavior
+  4. Implement basic movements (forward, backward, turn, curve)
 
 HARDWARE:
 ---------
@@ -36,6 +37,9 @@ THEORY - PWM:
     - 0% duty cycle   = motor stopped
     - 50% duty cycle  = half speed
     - 100% duty cycle = full speed
+
+  The frequency determines how fast it switches. Lower frequency = audible
+  whine, higher frequency = silent but may affect torque at low speeds.
 
   We use 0-255 scale for speed (0 = stop, 255 = full speed)
 
@@ -128,15 +132,15 @@ def main():
     # -------------------------------------------------------------------------
     print("\n--- Demo 3: Curves ---")
 
-    print("  Curve left...")
-    motors.curve_left(DEFAULT_SPEED, ratio=0.3)
+    print("  Curve left (left=40, right=120)...")
+    motors.set_speed(40, 120)
     time.sleep(MOVE_TIME)
 
     motors.stop()
     time.sleep(0.5)
 
-    print("  Curve right...")
-    motors.curve_right(DEFAULT_SPEED, ratio=0.3)
+    print("  Curve right (left=120, right=40)...")
+    motors.set_speed(120, 40)
     time.sleep(MOVE_TIME)
 
     motors.stop()
@@ -145,17 +149,35 @@ def main():
     # -------------------------------------------------------------------------
     # DEMO 4: Direct motor control
     # -------------------------------------------------------------------------
-    print("\n--- Demo 4: Direct Control (set_speeds) ---")
+    print("\n--- Demo 4: Direct Control (set_speed) ---")
 
     print("  Left=100, Right=200 (curve right)...")
-    motors.set_speeds(100, 200)
+    motors.set_speed(100, 200)
     time.sleep(MOVE_TIME)
 
     print("  Left=200, Right=100 (curve left)...")
-    motors.set_speeds(200, 100)
+    motors.set_speed(200, 100)
     time.sleep(MOVE_TIME)
 
     motors.stop()
+
+    # -------------------------------------------------------------------------
+    # DEMO 5: PWM Frequency — listen to the difference
+    # -------------------------------------------------------------------------
+    print("\n--- Demo 5: PWM Frequency ---")
+    print("  Hold the robot — wheels will spin freely")
+    print("  Listen to how the motor sound changes!\n")
+
+    for freq in [100, 500, 1000, 5000, 20000]:
+        motors.set_freq(freq)
+        motors.forward(DEFAULT_SPEED)
+        print(f"  {freq:>5} Hz — listen...")
+        time.sleep(1.5)
+        motors.stop()
+        time.sleep(0.3)
+
+    # Restore default
+    motors.set_freq(1000)
 
     # =========================================================================
     # YOUR EXERCISES:
@@ -179,9 +201,14 @@ def main():
     # EXERCISE 2: Figure-8 pattern
     # ----------------------------
     # Drive in a figure-8 using curves
-    # Hint: Curve left, then curve right, repeat
+    # Hint: Use set_speed() with different left/right values
     #
     # Your code here:
+    # motors.set_speed(60, 120)  # curve right
+    # time.sleep(2.0)
+    # motors.set_speed(120, 60)  # curve left
+    # time.sleep(2.0)
+    # motors.stop()
 
     # EXERCISE 3: Speed ramp
     # ----------------------
@@ -197,12 +224,21 @@ def main():
     #     time.sleep(0.1)
     # motors.stop()
 
-    # EXERCISE 4: Dance routine
-    # -------------------------
-    # Create a fun dance routine combining movements
-    # Be creative!
+    # EXERCISE 4: Find the best frequency
+    # ------------------------------------
+    # Try different PWM frequencies and test the dead zone at each.
+    # Which frequency gives the smoothest startup?
     #
     # Your code here:
+    # for freq in [500, 1000, 5000, 20000]:
+    #     motors.set_freq(freq)
+    #     print(f"\n{freq} Hz:")
+    #     for speed in range(20, 81, 10):
+    #         motors.set_speed(speed, 0)
+    #         time.sleep(0.5)
+    #         print(f"  Speed {speed}")
+    #     motors.stop()
+    # motors.set_freq(1000)  # restore default
 
     # =========================================================================
 
@@ -221,11 +257,9 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\nStopped by user")
-        # Safety: stop motors on interrupt
         motors = Motors()
         motors.stop()
     except Exception as e:
         print(f"\nError: {e}")
-        # Safety: stop motors on error
         motors = Motors()
         motors.stop()

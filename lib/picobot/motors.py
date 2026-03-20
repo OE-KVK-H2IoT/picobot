@@ -67,7 +67,7 @@ class Motor:
                 self._pwm.deinit()
             Pin(other, Pin.OUT, value=0)
             self._pwm = PWM(Pin(target))
-            self._pwm.freq(HARDWARE.MOTOR_PWM_FREQ)
+            self._pwm.freq(self.freq)
             self._active_pin = target
 
         self._pwm.duty_u16(duty)
@@ -86,6 +86,22 @@ class Motor:
     def speed(self):
         """Current speed setting."""
         return self._speed
+
+    def set_freq(self, freq):
+        """
+        Set PWM frequency in Hz.
+
+        Args:
+            freq: Frequency in Hz (e.g. 500, 1000, 20000)
+        """
+        self._freq = freq
+        if self._pwm:
+            self._pwm.freq(freq)
+
+    @property
+    def freq(self):
+        """Current PWM frequency in Hz."""
+        return getattr(self, '_freq', HARDWARE.MOTOR_PWM_FREQ)
 
     def set_pwm(self, duty_percent):
         """
@@ -124,6 +140,19 @@ class Motors:
         """Stop both motors."""
         self.left.stop()
         self.right.stop()
+
+    def set_freq(self, freq):
+        """
+        Set PWM frequency for both motors.
+
+        Args:
+            freq: Frequency in Hz (e.g. 500, 1000, 20000)
+        """
+        self.left.set_freq(freq)
+        self.right.set_freq(freq)
+
+    # Legacy alias used by older labs
+    set_speeds = set_speed
 
     def forward(self, speed):
         """Drive forward."""

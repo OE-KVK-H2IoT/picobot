@@ -62,7 +62,7 @@ def main():
                 # Getting close - slow turn
                 robot.leds.fill(255, 165, 0)  # Orange
                 robot.leds.show()
-                robot.motors.curve_right(DRIVE_SPEED, 0.3)
+                robot.motors.set_speed(DRIVE_SPEED, int(DRIVE_SPEED * 0.3))
 
             else:
                 # Clear - drive forward
