@@ -9,7 +9,7 @@ Later (Lab 09) they'll create their own config.py.
 class PINS:
     """Hardware pin assignments."""
 
-    # Motors (DRV8833 H-bridge, 2 PWM pins per motor)
+    # Motors (AM1016A H-bridge, one IC per motor, 2 PWM pins per motor)
     MOTOR_LEFT_A = 13     # Forward
     MOTOR_LEFT_B = 12     # Backward
 
@@ -17,10 +17,10 @@ class PINS:
     MOTOR_RIGHT_B = 11    # Backward
 
     # Encoders (quadrature hall sensors)
-    ENCODER_LEFT_A = 16
-    ENCODER_LEFT_B = 17
-    ENCODER_RIGHT_A = 8
-    ENCODER_RIGHT_B = 9
+    ENCODER_LEFT_A = 20
+    ENCODER_LEFT_B = 21
+    ENCODER_RIGHT_A = 18
+    ENCODER_RIGHT_B = 19
 
     # Line sensors (directly configure)
     LINE_SENSORS = [2, 3, 4, 5]  # Left to right
@@ -50,8 +50,8 @@ class CONTROL:
 
     # Line following
     DEFAULT_SPEED = 80
-    DEFAULT_KP = 30
-    SENSOR_WEIGHTS = [-1.5, -0.5, 0.5, 1.5]
+    DEFAULT_KP = 10
+    SENSOR_WEIGHTS = [-2, -0.5, 0.5, 2]
 
     # Turning
     TURN_SPEED = 80

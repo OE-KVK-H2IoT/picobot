@@ -15,6 +15,7 @@ from .robot import Robot
 from .motors import Motors
 from .sensors import LineSensors, Ultrasonic, Microphone
 from .leds import LEDStrip
+from .led_panel import LEDPanel, DiamondPanel
 from .buzzer import Buzzer
 from .utils import DataLogger, Timer
 from .state_machine import StateMachine
@@ -26,7 +27,7 @@ PicoBot = Robot
 __all__ = [
     'Robot', 'PicoBot',
     'Motors', 'LineSensors', 'Ultrasonic', 'Microphone',
-    'LEDStrip', 'Buzzer',
+    'LEDStrip', 'LEDPanel', 'DiamondPanel', 'Buzzer',
     'DataLogger', 'Timer', 'StateMachine',
     'Encoder', 'Encoders',
 ]

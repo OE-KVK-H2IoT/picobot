@@ -23,7 +23,15 @@ _CHIP_ID = 0xD1
 
 # Sensitivity for ±2g range: 16384 LSB/g
 _ACC_SENSITIVITY = 16384.0
-# Sensitivity for ±125°/s range: 262.4 LSB/°/s
+# Gyro range options: register value → (max °/s, LSB per °/s)
+_GYR_RANGES = {
+    125:  (0x04, 262.4),
+    250:  (0x03, 131.2),
+    500:  (0x02, 65.6),
+    1000: (0x01, 32.8),
+    2000: (0x00, 16.4),
+}
+# Default sensitivity (set during calibrate or _init_imu)
 _GYR_SENSITIVITY = 262.4
 
 
@@ -59,6 +67,7 @@ class IMU:
             print("WARNING: No BMI160 detected!")
 
         self._gyro_bias = 0.0
+        self._gyr_sensitivity = 262.4  # Default: ±125°/s
         self._heading = 0.0
         self._last_update = time.ticks_us()
 
@@ -113,18 +122,24 @@ class IMU:
             raw = data[0] | (data[1] << 8)
             if raw > 32767:
                 raw -= 65536
-            return raw / _GYR_SENSITIVITY
+            return raw / self._gyr_sensitivity
         except:
             return 0.0
 
-    def calibrate(self, samples=None):
+    def calibrate(self, samples=None, gyro_range=500):
         """
-        Calibrate gyroscope bias.
+        Calibrate gyroscope bias and optionally set the measurement range.
 
         IMPORTANT: Keep robot stationary during calibration!
 
         Args:
             samples: Number of samples (default from config)
+            gyro_range: Maximum rotation speed in °/s.
+                125  = most precise, clips above 125°/s (slow motion only)
+                250  = moderate turns
+                500  = fast robot turns (recommended for motor-driven turns)
+                1000 = very fast rotation
+                2000 = extreme (least precise)
 
         Returns:
             Measured bias value
@@ -132,7 +147,14 @@ class IMU:
         if samples is None:
             samples = CONTROL.GYRO_CALIBRATION_SAMPLES
 
-        print("Calibrating gyro... DON'T MOVE!")
+        # Set gyro range if the IMU is connected
+        if self._address and gyro_range in _GYR_RANGES:
+            reg_val, sensitivity = _GYR_RANGES[gyro_range]
+            self._i2c.writeto_mem(self._address, _REG_GYR_RANGE, bytes([reg_val]))
+            self._gyr_sensitivity = sensitivity
+            time.sleep(0.01)  # Wait for range change to take effect
+
+        print(f"Calibrating gyro (±{gyro_range}°/s)... DON'T MOVE!")
 
         total = 0.0
         for i in range(samples):
@@ -147,7 +169,7 @@ class IMU:
         self._heading = 0.0
         self._last_update = time.ticks_us()
 
-        print(f"\nBias: {self._gyro_bias:.4f} deg/s")
+        print(f"\nBias: {self._gyro_bias:.4f} deg/s  Range: ±{gyro_range}°/s")
         return self._gyro_bias
 
     def update(self):

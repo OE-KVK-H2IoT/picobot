@@ -24,7 +24,27 @@ class LineSensors:
     def __init__(self):
         """Initialize line sensor array."""
         self._sensors = [Pin(p, Pin.IN) for p in PINS.LINE_SENSORS]
-        self._weights = CONTROL.SENSOR_WEIGHTS
+        self._weights = list(CONTROL.SENSOR_WEIGHTS)
+
+    @property
+    def weights(self):
+        """Current sensor weights for error calculation."""
+        return self._weights
+
+    @weights.setter
+    def weights(self, new_weights):
+        """
+        Set custom sensor weights.
+
+        The weights define the error value for each sensor position.
+        Default: [-2, -0.5, 0.5, 2] (left-to-right, wider spacing on outer sensors).
+
+        Example:
+            robot.sensors.line.weights = [-1.5, -0.5, 0.5, 1.5]  # Equal spacing
+            robot.sensors.line.weights = [-3, -1, 1, 3]            # Wider range
+        """
+        if len(new_weights) == len(self._sensors):
+            self._weights = list(new_weights)
 
     def read_raw(self):
         """

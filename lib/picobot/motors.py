@@ -1,7 +1,7 @@
 """
 Motor control module.
 
-DRV8833 / NMS1100A H-bridge: each motor has two inputs (A and B).
+AM1016A H-bridge: each motor has two inputs (A and B).
   - Forward:  PWM on pin A, pin B held LOW (GPIO)
   - Backward: pin A held LOW (GPIO), PWM on pin B
   - Stop:     both pins LOW (coast)
