@@ -35,3 +35,7 @@ python viewer.py
 ## Course Documentation
 
 Full course documentation: https://www.aut.uni-obuda.hu/es/
+
+## License
+
+MIT — see [LICENSE](LICENSE). The course documentation this code accompanies is CC BY 4.0 (see the courses repo).
